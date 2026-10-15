@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Your cart | E-commerce Store{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="h2 mb-4">Your cart</h1>
+    {% if cart.lines %}
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead><tr><th>Product</th><th>Unit price</th><th>Quantity</th><th>Subtotal</th><th></th></tr></thead>
+                <tbody>
+                {% for line in cart.lines %}
+                    <tr>
+                        <td>
+                            {% if line.product.image %}<img src="{{ line.product.image.url }}" class="cart-thumb me-2" alt="{{ line.product.name }}">{% endif %}
+                            <a href="{{ line.product.get_absolute_url }}">{{ line.product.name }}</a>
+                            {% if not line.available %}<div class="text-danger small">{{ line.issue }}</div>{% endif %}
+                        </td>
+                        <td>₹{{ line.unit_price }}</td>
+                        <td>
+                            {% if line.available %}
+                                <form method="post" action="{% url 'cart:update' line.product.slug %}" class="d-flex gap-2">
+                                    {% csrf_token %}<input class="quantity-input" name="quantity" type="number" min="1" max="{{ line.product.stock_quantity }}" value="{{ line.quantity }}"><button class="btn btn-sm btn-outline-primary">Update</button>
+                                </form>
+                            {% else %}{{ line.quantity }}{% endif %}
+                        </td>
+                        <td>₹{{ line.subtotal }}</td>
+                        <td><form method="post" action="{% url 'cart:remove' line.product.slug %}">{% csrf_token %}<button class="btn btn-sm btn-outline-danger">Remove</button></form></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="row justify-content-end"><div class="col-md-5 col-lg-4">
+            <div class="card card-body">
+                <div class="d-flex justify-content-between"><span>Items</span><strong>{{ cart.item_count }}</strong></div>
+                <div class="d-flex justify-content-between mt-2"><span>Subtotal</span><strong>₹{{ cart.subtotal }}</strong></div>
+                {% if cart.has_invalid_lines %}<div class="alert alert-warning mt-3 mb-0">Remove unavailable items before checkout.</div>{% else %}<a class="btn btn-primary mt-3" href="{% url 'orders:checkout' %}">Proceed to checkout</a>{% endif %}
+            </div>
+        </div></div>
+    {% else %}
+        <div class="alert alert-info">Your cart is empty. <a href="{% url 'catalog:product_list' %}">Continue shopping</a>.</div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Wishlist | E-commerce Store{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <h1 class="h2 mb-4">Wishlist</h1>
+    <div class="row g-4">
+    {% for item in items %}
+        <div class="col-md-4"><div class="card h-100"><div class="card-body">
+            <h2 class="h5"><a href="{{ item.product.get_absolute_url }}">{{ item.product.name }}</a></h2>
+            <p class="mb-0">₹{{ item.product.price }}</p>
+        </div></div></div>
+    {% empty %}<p class="text-muted">Your wishlist is empty. Save products you want to revisit.</p>{% endfor %}
+    </div>
+</div>
+{% endblock %}

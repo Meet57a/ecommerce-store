@@ -1,0 +1,3 @@
+Your order {{ order.order_number }} has been confirmed.
+Total: ₹{{ order.total }}
+Thank you for shopping with us.

@@ -1,0 +1,5 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} | E-commerce Store{% endblock %}
+{% block content %}
+<div class="container py-4"><div class="row justify-content-center"><div class="col-lg-8"><h1 class="h2 mb-4">{{ title }}</h1><form method="post" enctype="multipart/form-data" class="card card-body">{% csrf_token %}{{ form.as_p }}<button class="btn btn-primary" type="submit">Save product</button></form></div></div></div>
+{% endblock %}

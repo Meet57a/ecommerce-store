@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Payment for {{ order.order_number }} | E-commerce Store{% endblock %}
+{% block content %}
+<div class="container py-5"><div class="row justify-content-center"><div class="col-lg-6">
+    <div class="card card-body text-center">
+        <h1 class="h3">Complete payment</h1>
+        <p class="text-muted">Order {{ order.order_number }} · ₹{{ order.total }} {{ payment.currency }}</p>
+        <button id="pay-button" class="btn btn-primary">Pay securely with Razorpay test mode</button>
+        <form id="failure-form" method="post" action="{% url 'payments:failed' order.order_number %}" class="d-none">{% csrf_token %}</form>
+        <div id="payment-error" class="alert alert-danger mt-3 d-none"></div>
+    </div>
+</div></div></div>
+{% endblock %}
+{% block extra_js %}
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+const options = {
+    key: "{{ razorpay_key_id|escapejs }}",
+    amount: "{{ payment.amount_paise }}",
+    currency: "{{ payment.currency|escapejs }}",
+    name: "E-commerce Store",
+    description: "Order {{ order.order_number|escapejs }}",
+    order_id: "{{ payment.gateway_order_id|escapejs }}",
+    handler: function (response) {
+        const body = new URLSearchParams({
+            csrfmiddlewaretoken: "{{ csrf_token }}",
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_signature: response.razorpay_signature
+        });
+        fetch("{% url 'payments:verify' order.order_number %}", {
+            method: "POST",
+            headers: {"X-Requested-With": "XMLHttpRequest"},
+            body: body
+        }).then(result => result.json()).then(data => {
+            if (data.success) window.location.href = data.redirect_url;
+            else showError(data.error || "Payment verification failed.");
+        }).catch(() => showError("Payment verification failed."));
+    },
+    modal: {ondismiss: function () { document.getElementById("failure-form").submit(); }},
+    theme: {color: "#0d6efd"}
+};
+function showError(message) {
+    const error = document.getElementById("payment-error");
+    error.textContent = message;
+    error.classList.remove("d-none");
+}
+document.getElementById("pay-button").addEventListener("click", function () {
+    if (!window.Razorpay) return showError("Payment gateway could not be loaded.");
+    new Razorpay(options).open();
+});
+</script>
+{% endblock %}

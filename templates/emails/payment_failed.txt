@@ -1,0 +1,1 @@
+Payment for order {{ order.order_number }} was not completed. Please try again.

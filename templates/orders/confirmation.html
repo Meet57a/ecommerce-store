@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Order #{{ order.pk }} | E-commerce Store{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="alert alert-info">
+        <h1 class="h3">Order {{ order.order_number }} created</h1>
+        <p class="mb-0">Your order is pending payment. No payment has been marked as successful.</p>
+    </div>
+    <div class="card card-body">
+        {% for item in order.items.all %}<div class="d-flex justify-content-between border-bottom py-2"><span>{{ item.product_name }} × {{ item.quantity }}</span><span>₹{{ item.line_total }}</span></div>{% endfor %}
+        <div class="d-flex justify-content-between mt-3 fs-5"><strong>Total</strong><strong>₹{{ order.total }}</strong></div>
+        <a class="btn btn-outline-primary mt-3" href="{% url 'orders:detail' order.order_number %}">View order</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.name }} | E-commerce Store{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row g-5">
+        <div class="col-md-6">
+            {% if product.image %}
+                <img src="{{ product.image.url }}" class="img-fluid rounded product-detail-image" alt="{{ product.name }}">
+            {% else %}
+                <div class="product-placeholder product-detail-image d-flex align-items-center justify-content-center">No image</div>
+            {% endif %}
+        </div>
+        <div class="col-md-6">
+            <p class="text-muted">{{ product.category.name }}</p>
+            <h1>{{ product.name }}</h1>
+            <p class="display-6">₹{{ product.price }}</p>
+            <p>{{ product.description|linebreaks }}</p>
+            {% if product.is_available %}
+                <span class="badge text-bg-success">In stock</span>
+                <form method="post" action="{% url 'cart:add' product.slug %}" class="row g-2 mt-3">
+                    {% csrf_token %}
+                    <div class="col-4"><label class="visually-hidden" for="quantity">Quantity</label><input id="quantity" name="quantity" type="number" value="1" min="1" max="{{ product.stock_quantity }}"></div>
+                    <div class="col-auto"><input type="hidden" name="next" value="{{ product.get_absolute_url }}"><button class="btn btn-primary" type="submit">Add to cart</button></div>
+                </form>
+            {% else %}
+                <span class="badge text-bg-secondary">Unavailable</span>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Admin dashboard | E-commerce Store{% endblock %}
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4"><h1 class="h2">Admin dashboard</h1><div><a class="btn btn-outline-primary" href="{% url 'dashboard:report' %}">Reports</a> <a class="btn btn-primary" href="{% url 'dashboard:product_list' %}">Manage products</a></div></div>
+    <div class="row g-3 mb-4">
+        {% for label,value in dashboard_cards %}{% endfor %}
+        <div class="col-sm-6 col-xl-2"><div class="card card-body"><span class="text-muted">Total orders</span><strong class="fs-3">{{ total_orders }}</strong></div></div>
+        <div class="col-sm-6 col-xl-2"><div class="card card-body"><span class="text-muted">Pending orders</span><strong class="fs-3">{{ pending_orders }}</strong></div></div>
+        <div class="col-sm-6 col-xl-2"><div class="card card-body"><span class="text-muted">Customers</span><strong class="fs-3">{{ total_customers }}</strong></div></div>
+        <div class="col-sm-6 col-xl-2"><div class="card card-body"><span class="text-muted">Products</span><strong class="fs-3">{{ total_products }}</strong></div></div>
+        <div class="col-sm-6 col-xl-2"><div class="card card-body"><span class="text-muted">Low stock</span><strong class="fs-3 text-warning">{{ low_stock_products }}</strong></div></div>
+        <div class="col-sm-6 col-xl-2"><div class="card card-body"><span class="text-muted">Verified sales</span><strong class="fs-5">₹{{ verified_revenue }}</strong></div></div>
+    </div>
+    <div class="row g-4">
+        <div class="col-lg-7"><div class="card card-body"><h2 class="h5">Recent orders</h2><div class="table-responsive"><table class="table"><thead><tr><th>Order</th><th>Customer</th><th>Status</th><th>Total</th></tr></thead><tbody>{% for order in recent_orders %}<tr><td><a href="{% url 'dashboard:order_detail' order.order_number %}">{{ order.order_number }}</a></td><td>{{ order.user.email }}</td><td>{{ order.get_status_display }}</td><td>₹{{ order.total }}</td></tr>{% empty %}<tr><td colspan="4">No orders.</td></tr>{% endfor %}</tbody></table></div></div></div>
+        <div class="col-lg-5"><div class="card card-body"><h2 class="h5">Recent payment activity</h2><div class="table-responsive"><table class="table"><thead><tr><th>Order</th><th>Status</th><th>Amount</th></tr></thead><tbody>{% for payment in recent_payments %}<tr><td>{{ payment.order.order_number }}</td><td>{{ payment.get_status_display }}</td><td>₹{{ payment.amount }}</td></tr>{% empty %}<tr><td colspan="3">No payment activity.</td></tr>{% endfor %}</tbody></table></div></div></div>
+    </div>
+</div>
+{% endblock %}

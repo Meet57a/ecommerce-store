@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}My orders | E-commerce Store{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <h1 class="h2 mb-4">My orders</h1>
+    {% if orders %}
+        <div class="table-responsive"><table class="table align-middle">
+            <thead><tr><th>Order</th><th>Date</th><th>Status</th><th>Total</th><th></th></tr></thead>
+            <tbody>{% for order in orders %}<tr>
+                <td>{{ order.order_number }}</td><td>{{ order.created_at|date:"d M Y" }}</td><td>{{ order.get_status_display }}</td><td>₹{{ order.total }}</td>
+                <td><a class="btn btn-sm btn-outline-primary" href="{% url 'orders:detail' order.order_number %}">View</a></td>
+            </tr>{% endfor %}</tbody>
+        </table></div>
+    {% else %}<div class="alert alert-info">You have no orders yet.</div>{% endif %}
+</div>
+{% endblock %}

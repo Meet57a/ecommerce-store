@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout | E-commerce Store{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="h2 mb-4">Checkout</h1>
+    <form method="post" class="row g-4">
+        {% csrf_token %}
+        <div class="col-lg-7"><div class="card card-body">
+            <h2 class="h5 mb-3">Shipping details</h2>
+            {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+            {% for field in form %}
+                <div class="mb-3{% if field.name == 'use_saved_address' or field.name == 'save_address' %} form-check{% endif %}">
+                    {{ field }}
+                    <label class="{% if field.name == 'use_saved_address' or field.name == 'save_address' %}form-check-label{% else %}form-label{% endif %}" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                </div>
+            {% endfor %}
+            <p class="text-muted small">A new address can be saved for future orders. You will be redirected to Razorpay test checkout after this order is validated.</p>
+        </div></div>
+        <div class="col-lg-5"><div class="card card-body">
+            <h2 class="h5">Order summary</h2>
+            <form method="post" action="{% url 'coupons:apply' %}" class="input-group mb-3">
+                {% csrf_token %}<input class="form-control" name="code" placeholder="Coupon code" value="{{ request.session.coupon_code|default:'' }}"><button class="btn btn-outline-secondary">Apply</button>
+            </form>
+            {% if request.session.coupon_id %}<form method="post" action="{% url 'coupons:remove' %}">{% csrf_token %}<button class="btn btn-sm btn-link p-0">Remove coupon</button></form>{% endif %}
+            {% for line in cart.lines %}<div class="d-flex justify-content-between border-bottom py-2"><span>{{ line.product.name }} × {{ line.quantity }}</span><span>₹{{ line.subtotal }}</span></div>{% endfor %}
+            <div class="d-flex justify-content-between mt-3"><span>Subtotal</span><strong>₹{{ totals.subtotal }}</strong></div>
+            <div class="d-flex justify-content-between"><span>Shipping</span><strong>₹{{ totals.shipping_charge }}</strong></div>
+            <div class="d-flex justify-content-between"><span>Discount</span><strong>₹{{ totals.discount }}</strong></div>
+            <div class="d-flex justify-content-between fs-5 mt-2"><span>Total</span><strong>₹{{ totals.total }}</strong></div>
+            <button class="btn btn-primary mt-4" type="submit">Continue to payment</button>
+        </div></div>
+    </form>
+</div>
+{% endblock %}
